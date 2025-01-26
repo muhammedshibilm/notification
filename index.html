@@ -4,11 +4,76 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notification Test</title>
+  <style>
+    #message {
+      margin-top: 20px;
+      color: red;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
   <h1>Browser Notification Example</h1>
   <button id="notify-btn">Show Notification</button>
+  <div id="message"></div> <!-- Area to display error messages -->
 
-  <script src="script.js"></script>
+  <script>
+    const messageDiv = document.getElementById("message");
+
+    // Function to display error/success messages
+    function showMessage(message, isError = true) {
+      messageDiv.style.color = isError ? "red" : "green";
+      messageDiv.textContent = message;
+    }
+
+    // Function to check notification permission
+    function requestNotificationPermission() {
+      if (!("Notification" in window)) {
+        showMessage("This browser does not support desktop notifications.");
+        return;
+      }
+
+      // Request permission if not already granted
+      if (Notification.permission === "default") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            showMessage("Notification permission granted! Press the button to see a notification.", false);
+          } else {
+            showMessage("Notification permission denied. Please enable it in browser settings.");
+          }
+        });
+      } else if (Notification.permission === "denied") {
+        showMessage("You have denied notifications. Please enable them in browser settings.");
+      } else {
+        showMessage("Notification permission already granted. Press the button to show a notification.", false);
+      }
+    }
+
+    // Function to show a notification
+    function showNotification() {
+      if (Notification.permission === "granted") {
+        // Create and display a notification
+        const notification = new Notification("Hello!", {
+          body: "This is your notification message.",
+          icon: "https://via.placeholder.com/128", // Optional icon URL
+        });
+
+        // Handle click on notification
+        notification.onclick = () => {
+          window.open("https://example.com", "_blank");
+        };
+
+        showMessage("Notification displayed successfully!", false);
+      } else {
+        showMessage("Notifications are not allowed. Please grant permission.");
+      }
+    }
+
+    // Add event listener to the button
+    document.getElementById("notify-btn").addEventListener("click", showNotification);
+
+    // Ask for notification permission on page load
+    requestNotificationPermission();
+  </script>
 </body>
 </html>
