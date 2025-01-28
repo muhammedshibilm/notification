@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -5,20 +6,28 @@
     <title>Notification</title>
 </head>
 <body>
-    <button id="noti">press me</button>
+    <button id="noti">Press Me</button>
     <script>
-        let btn = document.querySelector("#noti");
+        const btn = document.querySelector("#noti");
 
-        btn.addEventListener("click",()=>{
-            console.log("pressed")
-            Notification.requestPermission().then((perm)=>{
-                console.log(perm);
-                if (perm === "granted") {
-                    new Notification("hai")
+        btn.addEventListener("click", async () => {
+            console.log("Button pressed");
+            
+            // Request notification permission
+            const perm = await Notification.requestPermission();
+            console.log(perm);
+
+            if (perm === "granted") {
+                // Use service worker for mobile compatibility
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js').then((registration) => {
+                        registration.showNotification("Hello from Service Worker!");
+                    });
+                } else {
+                    new Notification("Hello!");
                 }
-                
-            })
-        })
+            }
+        });
     </script>
 </body>
 </html>
